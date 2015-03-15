@@ -1,0 +1,57 @@
+
+         FACTORISATION DE GRANDS NOMBRES SEMI-PREMIERS
+
+Un nombre semi-premier est le produit de deux nombres premiers. Par
+exemple, 10 = 2*5, 25 = 5*5, ou 4611685704894780481 = 2147483587 *
+2147483563.
+
+Vous trouverez sur moodle un programme de factorisation de grands
+nombres semi-premiers en utilisant un algorithme brute-force. Le but
+de ce projet est de paralléliser ce programme en mpi. Ce programme
+sera commenté lors de la séance de TP du 5 mars.
+Références :
+- crible d'ératosthène :
+  http://fr.wikipedia.org/wiki/Crible_d%27%C3%89ratosth%C3%A8ne
+- gmp : https://gmplib.org/
+
+Il ne vous est pas demandé d'utiliser un algorithme plus efficace pour
+résoudre ce problème, bien que de tels algorithmes existent (voir par
+exemple "crible quadratique" sur wikipedia). Vous devez utiliser
+l'algorithme de type brute-force par divisions successives donné en
+référence.
+
+Ce problème est extrêmement intéressant, car il est à la base des
+algorithmes de cryptage basés sur clés publique/privée, RSA notamment.
+Dans RSA, la clé publique est le produit de deux très grands nombres
+premiers (de 512 bits par exemple) : un nombre semi-premier de 1024
+bits. Pour décoder le message codé grâce à ce nombre semi-premier (la
+clé publique), il est nécessaire de connaître sa factorisation (un de
+ses diviseurs : la clé privée). Or il est imposible de factoriser un
+nombre semi-premier de 1024 bits en un temps raisonnable, avec les
+connaissances mathématiques et les capacités informatiques actuelles.
+Dans ce projet, vous allez (peut-être) cracker des clés RSA de 80
+bits, voire une centaine, mais guère plus. Vous serez limités aux clés
+de 128 bits par l'implémentation, qui code les deux diviseurs dans des
+entiers 64 bits.
+
+Voici quelques exemples de clés RSA-<nombre de bits>, que vous pourrez
+utiliser pour faire vos tests :
+- RSA-62 : 4611685704894780481
+  -> temps de recherche sur un coeur corei7 : 12.7s
+  (solution : 2147483587 2147483563)
+- RSA-70 : 1639856366400926431141
+  -> 5min
+  (solution : 41000000021 39996496721)
+- RSA-80 : 360597895876381766679361
+  -> 1h15
+  (solution : 600999999781 599996499181)
+- RSA-90 : 725999999974645000000200901
+  (je ne vous donne pas la solution, à vous de la trouver !
+   indication : il y a beaucoup de 9 dans les diviseurs)
+- RSA-100 : 507204455171826755240353713209
+  (idem, il y a beaucoup de 9 dans l'un des deux diviseurs)
+
+Vous pouvez bien évidemment en générer d'autres, il suffit de faire le
+produit de deux grands nombres premiers, pour faire des mesures de
+performances de votre programme parallèle.
+
