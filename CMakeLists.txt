@@ -7,6 +7,10 @@ set(NSA_VERSION_MAJOR 0)
 set(NSA_VERSION_MINOR 0)
 set(NSA_VERSION_PATCH 1)
 
+if(NOT CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     # cmake adds -g automatically
     set(DEBUG ON)
@@ -58,7 +62,7 @@ else()
 endif()
 
 if(NOT DEFINED DATE AND EXISTS "${DATE_PROG}")
-    execute_process(COMMAND "${DATE_PROG}"
+    execute_process(COMMAND "${DATE_PROG}" "+%F"
         OUTPUT_STRIP_TRAILING_WHITESPACE
         OUTPUT_VARIABLE DATE)
 else()
@@ -83,6 +87,7 @@ endif()
 
 add_executable(nsa
     "${CMAKE_CURRENT_SOURCE_DIR}/src/nsa/main.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/nsa/eratostene.c"
     )
 target_link_libraries(nsa
     "${MPI_C_LIBRARIES}"
@@ -90,14 +95,14 @@ target_link_libraries(nsa
     "${LibGMP_LIBRARIES}"
     )
 
-add_executable(prof
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/nsa/factoint28inter.c"
-    )
-target_link_libraries(prof
-    "${MPI_C_LIBRARIES}"
-    "${LibM_LIBRARIES}"
-    "${LibGMP_LIBRARIES}"
-    )
+#add_executable(prof
+#    "${CMAKE_CURRENT_SOURCE_DIR}/src/nsa/factoint28inter.c"
+#    )
+#target_link_libraries(prof
+#    "${MPI_C_LIBRARIES}"
+#    "${LibM_LIBRARIES}"
+#    "${LibGMP_LIBRARIES}"
+#    )
 
 
 # Install

@@ -38,8 +38,19 @@
 #include <stdio.h>
 #include <sysexits.h>
 #include <mpi.h>
+#include <unistd.h>
 
 #include "nsa/version.h"
+
+static inline void fprintf_help(FILE *outstream, const char* const executable_path){
+    fprintf(outstream,
+            "\tNaive Semi-prime Accelerator\n"
+            "Usage: %s [<options>] <number>\n"
+            "Options:\n"
+            "\t-h : print this help and exit\n"
+            "\t-v : print version and exit\n",
+            executable_path);
+}
 
 /**
  * \brief Main function.
@@ -48,17 +59,36 @@
  * \retval EXIT_SUCCESS on success.
  * \retval EX_USAGE on user misbehaviour.
  */
-int main (int argc, char ** argv)
+int main (int argc, char **argv)
 {
+    int rank, size, opt;
+    while((opt=getopt(argc, argv, "hv")) != -1){
+        switch(opt){
+            case 'h':
+                fprintf_help(stdout, argv[0]);
+                exit(EXIT_SUCCESS);
+                break;
+            case 'v':
+                fprintf_version(stdout, argv[0]);
+                exit(EXIT_SUCCESS);
+                break;
+            default:
+                fprintf_help(stderr, argv[0]);
+                exit(EX_USAGE);
+                break;
+        }
+    }
     MPI_Init(&argc, &argv);
     --argc; argv++;
-    if (argc > 0)
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (argc != 1)
     {
-        fprintf (stderr, "Error: too many arguments.\n");
+        fprintf_help(stderr, argv[-1]);
+        MPI_Finalize();
         exit (EX_USAGE);
     }
 
-    fprintf_version (stderr, "nsa");
     fprintf (stderr, "This program does not do anything yet.\n");
 
     MPI_Finalize();

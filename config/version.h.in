@@ -55,11 +55,18 @@ static const unsigned int NSA_VERSION_PATCH = @NSA_VERSION_PATCH@;
 static const char username[] = "${USERNAME}";
 static const char hostname[] = "${HOSTNAME}";
 static const char date[] = "${DATE}";
+static const char program_name[] = "${CMAKE_PROJECT_NAME}";
 
 static inline void fprintf_version (FILE * const stream, const char * const name)
 {
-    fprintf (stream, "%s %u.%u.%u (%s@%s %s)\n",
+    fprintf (stream,
+            "%s (%s) %u.%u.%u (%s@%s %s)\n"
+            "Copyright (C) 2015 Razanajato Harenome, Schmitt Maxime\n"
+            "This is a free software; see the source for copying conditions.\n"
+            "There is NO WARRANTY.\n"
+            ,
             name,
+            program_name,
             NSA_VERSION_MAJOR,
             NSA_VERSION_MINOR,
             NSA_VERSION_PATCH,
