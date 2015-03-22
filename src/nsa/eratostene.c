@@ -136,7 +136,9 @@ void eratostene_coordinator(int size, mpz_t x){
     const unsigned int nbtimes = 100;
     mpz_t q, racine2x, racine4x, div, reste;
     mpz_inits(q, racine2x, racine4x, div, reste, NULL);
+    double time_begin, time_found;
 
+    time_begin = MPI_Wtime();
     /* vérifie que x n'est pas divisible par 2, sinon s'arrête ! */
     if( mpz_cdiv_q_ui( q, x, 2 ) == 0 )	// retourne le reste, stocke le quotient dans q
     {
@@ -171,10 +173,12 @@ void eratostene_coordinator(int size, mpz_t x){
             mpz_cdiv_qr( q, reste, x, div );
             if( mpz_cmp_ui( reste, 0 ) == 0 )
             {
+                time_found = MPI_Wtime();
                 // gagné !
                 printf( "\n" );
                 gmp_printf( "%Zd\n", q );
                 gmp_printf( "%Zd\n", div );
+                printf("Temps: %.3fs\n", time_found - time_begin);
 
                 mpz_clears(q, racine2x, racine4x, div, reste, NULL);
                 shutdown_all_slaves(size);
@@ -188,6 +192,8 @@ void eratostene_coordinator(int size, mpz_t x){
 
     for(int i=1; slaves_without_job && current <= r2xull; i++){
         current = send_job(i, current, nbtimes);
+        printf(" ** Thread %d: %lld-%lld **\n", i,current, current + nbtimes*TAILLE_CRIBLE);
+        fflush(stdout);
         slaves_without_job--;
     }
 
@@ -199,11 +205,13 @@ void eratostene_coordinator(int size, mpz_t x){
                 MPI_COMM_WORLD, &status);
         switch(status.MPI_TAG){
             case we_found_something:
+                time_found = MPI_Wtime();
                 mpz_set_ull(div, soluce);
                 mpz_cdiv_qr(q, reste, x, div);
                 printf( "\n" );
                 gmp_printf( "%Zd\n", q );
                 gmp_printf( "%Zd\n", div );
+                printf("Temps: %.3fs\n", time_found - time_begin);
                 slaves_without_job++;
 
                 soluce = wait_for_any_other_response(size - 1, &slaves_without_job);
@@ -215,6 +223,12 @@ void eratostene_coordinator(int size, mpz_t x){
                 return;
             case my_life_for_the_master:
                 current = send_job(status.MPI_SOURCE, current, nbtimes);
+                for(int i = 0; i < size - status.MPI_SOURCE; i++)
+                    printf("\x1B[1F");
+                printf("\r ** Thread %d: %lld-%lld **", status.MPI_SOURCE, current, current + nbtimes*TAILLE_CRIBLE);
+                for(int i = 0; i < size - status.MPI_SOURCE; i++)
+                    printf("\n");
+                fflush(stdout);
                 break;
             default:
                 break;
@@ -223,11 +237,14 @@ void eratostene_coordinator(int size, mpz_t x){
 
     soluce = wait_for_any_other_response(size - 1, &slaves_without_job);
     if(soluce){
+        time_found = MPI_Wtime();
         mpz_set_ull(div, soluce);
         mpz_cdiv_qr(q, reste, x, div);
         printf( "\n" );
         gmp_printf( "%Zd\n", q );
         gmp_printf( "%Zd\n", div );
+        printf("Temps: %.3fs\n", time_found - time_begin);
+        wait_for_any_other_response(size - 1, &slaves_without_job);
     }
     else
         printf( "\npas de solution (c'est un nombre premier) !\n" );
@@ -278,12 +295,8 @@ void eratostene_slaves(mpz_t x){
             default:
                 break;
         }
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    printf("esclave %d demande de job\n", rank);
         MPI_Ssend(NULL, 0, MPI_CHAR, COORDINATOR_ID, my_life_for_the_master,
                 MPI_COMM_WORLD);
-    printf("esclave %d demande de job recu par master\n", rank);
     }
 }
 
@@ -302,16 +315,12 @@ void shutdown_all_slaves(int size){
 }
 
 inline void i_got_it(unsigned long long holy_grail){
-    printf("FOUND IT %lld\n", holy_grail);
     MPI_Ssend(&holy_grail, 1, MPI_UNSIGNED_LONG_LONG, COORDINATOR_ID, we_found_something,
             MPI_COMM_WORLD);
 }
 
 enum message_type slave_wait_for_jobs(struct job *todo){
     MPI_Status status;
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    printf("%d Waiting\n", rank);
     MPI_Recv(todo, 2, message_datatype, COORDINATOR_ID, MPI_ANY_TAG,
             MPI_COMM_WORLD, &status);
     return status.MPI_TAG;
@@ -322,7 +331,6 @@ unsigned long long yes_my_lord_work_in_progress(struct job todo, mpz_t number,
     mpz_t q, div, reste;
     mpz_inits( q, div, reste, NULL);
     unsigned long long position = todo.start;
-    printf("TODO %lld, %ld\n", position, todo.multiplier);
     for(unsigned int i = 0; i < todo.multiplier; i++, position += TAILLE_CRIBLE){
         eratostene_intervalle(temp, position, e_base);
         for(unsigned long long j=0 ; j<(TAILLE_CRIBLE>>1) ; j++ )
@@ -356,15 +364,14 @@ unsigned long long send_job(const int process_id,
 }
 
 unsigned long long wait_for_any_other_response(int number, int *current){
-    unsigned long long soluce, retval = 0;
+    unsigned long long soluce;
     MPI_Status status;
-    for(int i = *current; i<number; i++){
+    while(*current != number){
         MPI_Recv(&soluce, 1, MPI_UNSIGNED_LONG_LONG, MPI_ANY_SOURCE, MPI_ANY_TAG,
                 MPI_COMM_WORLD, &status);
         if(status.MPI_TAG == we_found_something)
-            retval = soluce;
-        i++;
-        printf("Recu\n");
+            return soluce;
+        (*current)++;
     }
-    return retval;
+    return 0;
 }
