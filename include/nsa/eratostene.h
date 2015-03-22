@@ -83,7 +83,7 @@ unsigned char *eratostene_base( unsigned long long n );
 unsigned char *eratostene_intervalle( unsigned char *tab,
         const unsigned long long min, const unsigned char *const e_base );
 
-void eratostene_coordinator(int size, mpz_t x);
+void eratostene_coordinator(int size, mpz_t x, unsigned int multiplier);
 
 void eratostene_slaves(mpz_t x);
 

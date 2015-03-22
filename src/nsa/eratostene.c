@@ -77,7 +77,7 @@ unsigned char *eratostene_base(unsigned long long n)
         if( PREMIER(tab,i) )    // i*2+1 est premier
         {
             // donc on supprime ses multiples : 3i+1, 5i+2, 7i+3, ...
-            unsigned int ii;
+            unsigned long long int ii;
             for(ii=3*i+1; ii<n/2; ii+=2*i+1 )
             {
                 MET1(tab,ii);   // ce nombre n'est pas premier
@@ -132,8 +132,7 @@ unsigned char *eratostene_intervalle( unsigned char *tab, const unsigned long lo
     return( tab );
 }
 
-void eratostene_coordinator(int size, mpz_t x){
-    const unsigned int nbtimes = 100;
+void eratostene_coordinator(int size, mpz_t x, unsigned int multiplier){
     mpz_t q, racine2x, racine4x, div, reste;
     mpz_inits(q, racine2x, racine4x, div, reste, NULL);
     double time_begin, time_found;
@@ -191,8 +190,8 @@ void eratostene_coordinator(int size, mpz_t x){
     int slaves_without_job = size - 1;
 
     for(int i=1; slaves_without_job && current <= r2xull; i++){
-        current = send_job(i, current, nbtimes);
-        printf(" ** Thread %d: %lld-%lld **\n", i,current, current + nbtimes*TAILLE_CRIBLE);
+        current = send_job(i, current, multiplier);
+        printf(" ** Thread %d: %lld-%lld **\n", i,current, current + multiplier*TAILLE_CRIBLE);
         fflush(stdout);
         slaves_without_job--;
     }
@@ -212,7 +211,6 @@ void eratostene_coordinator(int size, mpz_t x){
                 gmp_printf( "%Zd\n", q );
                 gmp_printf( "%Zd\n", div );
                 printf("Temps: %.3fs\n", time_found - time_begin);
-                slaves_without_job++;
 
                 soluce = wait_for_any_other_response(size - 1, &slaves_without_job);
                 if(soluce)
@@ -222,10 +220,10 @@ void eratostene_coordinator(int size, mpz_t x){
                 mpz_clears(q, racine2x, racine4x, div, reste, NULL);
                 return;
             case my_life_for_the_master:
-                current = send_job(status.MPI_SOURCE, current, nbtimes);
+                current = send_job(status.MPI_SOURCE, current, multiplier);
                 for(int i = 0; i < size - status.MPI_SOURCE; i++)
                     printf("\x1B[1F");
-                printf("\r ** Thread %d: %lld-%lld **", status.MPI_SOURCE, current, current + nbtimes*TAILLE_CRIBLE);
+                printf("\r ** Thread %d: %lld-%lld **", status.MPI_SOURCE, current, current + multiplier*TAILLE_CRIBLE);
                 for(int i = 0; i < size - status.MPI_SOURCE; i++)
                     printf("\n");
                 fflush(stdout);
