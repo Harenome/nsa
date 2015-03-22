@@ -38,9 +38,11 @@
 #include <stdio.h>
 #include <sysexits.h>
 #include <mpi.h>
+#include <gmp.h>
 #include <unistd.h>
 
 #include "nsa/version.h"
+#include "nsa/eratostene.h"
 
 static inline void fprintf_help(FILE *outstream, const char* const executable_path){
     fprintf(outstream,
@@ -89,7 +91,18 @@ int main (int argc, char **argv)
         exit (EX_USAGE);
     }
 
-    fprintf (stderr, "This program does not do anything yet.\n");
+    /* lecture param en gmp */
+    mpz_t x;
+    mpz_init_set_str(x, argv[0], 10);
+
+    init_eratostene();
+
+    if(rank == COORDINATOR_ID)
+        eratostene_coordinator(size, x);
+    else
+        eratostene_slaves( x );
+
+    mpz_clear( x );
 
     MPI_Finalize();
     exit (EXIT_SUCCESS);
