@@ -214,7 +214,7 @@ void eratostene_coordinator(int size, mpz_t x, unsigned int multiplier){
 
                 soluce = wait_for_any_other_response(size - 1, &slaves_without_job);
                 if(soluce)
-                    fprintf(stderr, "erreur, reçu %lld\n", soluce);
+                    wait_for_any_other_response(size - 1, &slaves_without_job);
 
                 shutdown_all_slaves(size);
                 mpz_clears(q, racine2x, racine4x, div, reste, NULL);
@@ -242,7 +242,8 @@ void eratostene_coordinator(int size, mpz_t x, unsigned int multiplier){
         gmp_printf( "%Zd\n", q );
         gmp_printf( "%Zd\n", div );
         printf("Temps: %.3fs\n", time_found - time_begin);
-        wait_for_any_other_response(size - 1, &slaves_without_job);
+        if(wait_for_any_other_response(size - 1, &slaves_without_job))
+            wait_for_any_other_response(size - 1, &slaves_without_job);
     }
     else
         printf( "\npas de solution (c'est un nombre premier) !\n" );
