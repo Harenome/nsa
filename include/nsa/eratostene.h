@@ -51,6 +51,7 @@ enum message_type{
     we_found_something,     // Indique au coordinateur qu'une solution est troouvée.
     my_life_for_the_master, // Indique au coordinateur qu'un esclave demande du travail
     here_take_my_gift_son,  // Indique a un esclave un travail à effectuer
+    hey_listen,             // Indique au père qu'un interval est calculé
     //whats_up,               // Demande du coordinateur aux esclaves ou ils en sont
 };
 
@@ -92,18 +93,21 @@ void shutdown_all_slaves(const int size);
 
 enum message_type slave_wait_for_jobs(struct job * const todo);
 
+enum message_type slave_wait_for_pending_jobs(MPI_Request *request);
+
 static inline void i_got_it(const unsigned long long holy_grail){
     MPI_Ssend(&holy_grail, 1, MPI_UNSIGNED_LONG_LONG, COORDINATOR_ID, we_found_something,
             MPI_COMM_WORLD);
 }
 
-unsigned long long yes_my_lord_work_in_progress(const struct job todo, mpz_t number,
-        const unsigned char * const e_base, unsigned char *temp);
+unsigned long long yes_my_lord_work_in_progress(struct job todo, mpz_t number,
+        const unsigned char * const e_base, unsigned char *temp,
+        struct job *next, MPI_Request **response);
 
 unsigned long long send_job(const int process_id,
         const unsigned long long current,
         const unsigned int times);
 
-unsigned long long wait_for_any_other_response(const int number, int *current);
+unsigned long long wait_for_any_other_response(unsigned int *responses);
 
 #endif // __ERATHOSTENE_H
