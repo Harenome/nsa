@@ -64,10 +64,10 @@ static inline void fprintf_help(FILE *outstream, const char* const executable_pa
  */
 int main (int argc, char **argv)
 {
-    int rank, size, opt;
+    int rank, size, opt, pretty=0;
     unsigned int multiplier = 100;
     MPI_Init(&argc, &argv);
-    while((opt=getopt(argc, argv, "hvm:")) != -1){
+    while((opt=getopt(argc, argv, "phvm:")) != -1){
         switch(opt){
             case 'h':
                 fprintf_help(stdout, argv[0]);
@@ -76,6 +76,9 @@ int main (int argc, char **argv)
             case 'v':
                 fprintf_version(stdout, argv[0]);
                 exit(EXIT_SUCCESS);
+                break;
+            case 'p':
+                pretty = 1;
                 break;
             case 'm':
                 multiplier = atoi(optarg) > 0 ? (unsigned int) atoi(optarg) : 100;
@@ -103,7 +106,7 @@ int main (int argc, char **argv)
     init_eratostene();
 
     if(rank == COORDINATOR_ID)
-        eratostene_coordinator(size, x, multiplier);
+        eratostene_coordinator(size, x, multiplier, pretty);
     else
         eratostene_slaves( x );
 

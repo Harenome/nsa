@@ -80,26 +80,30 @@ unsigned char *eratostene_base( unsigned long long n );
  * renvoie un champ de bits correspondant aux entiers min, min+2, min+4, ...
  * qui vaut 0 si le nombre est premier, 1 sinon
  */
-unsigned char *eratostene_intervalle( unsigned char *tab,
-        const unsigned long long min, const unsigned char *const e_base );
+unsigned char *eratostene_intervalle(unsigned char *tab,
+        const unsigned long long min, const unsigned char * const e_base );
 
-void eratostene_coordinator(int size, mpz_t x, unsigned int multiplier);
+void eratostene_coordinator(const int size, mpz_t x, const unsigned int multiplier,
+        const int pretty_print);
 
 void eratostene_slaves(mpz_t x);
 
-void shutdown_all_slaves(int size);
+void shutdown_all_slaves(const int size);
 
-enum message_type slave_wait_for_jobs(struct job *todo);
+enum message_type slave_wait_for_jobs(struct job * const todo);
 
-void i_got_it(unsigned long long holy_grail);
+static inline void i_got_it(const unsigned long long holy_grail){
+    MPI_Ssend(&holy_grail, 1, MPI_UNSIGNED_LONG_LONG, COORDINATOR_ID, we_found_something,
+            MPI_COMM_WORLD);
+}
 
-unsigned long long yes_my_lord_work_in_progress(struct job todo, mpz_t number,
-        const unsigned char *const e_base, unsigned char *temp);
+unsigned long long yes_my_lord_work_in_progress(const struct job todo, mpz_t number,
+        const unsigned char * const e_base, unsigned char *temp);
 
 unsigned long long send_job(const int process_id,
         const unsigned long long current,
         const unsigned int times);
 
-unsigned long long wait_for_any_other_response(int number, int *current);
+unsigned long long wait_for_any_other_response(const int number, int *current);
 
 #endif // __ERATHOSTENE_H
