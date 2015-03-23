@@ -65,7 +65,7 @@ static inline void fprintf_help(FILE *outstream, const char* const executable_pa
 int main (int argc, char **argv)
 {
     int rank, size, opt, pretty=0;
-    unsigned int multiplier = 100;
+    unsigned int multiplier = 10;
     MPI_Init(&argc, &argv);
     while((opt=getopt(argc, argv, "phvm:")) != -1){
         switch(opt){
