@@ -137,7 +137,11 @@ void eratostene_coordinator(const int size, mpz_t x, const unsigned int multipli
     mpz_t q, racine2x, racine4x, div, reste;
     mpz_inits(q, racine2x, racine4x, div, reste, NULL);
     double time_begin, time_found;
-    unsigned int jobs_distributed = size - 1;
+    unsigned int jobs_distributed = (unsigned int) size - 1;
+    struct job *send_buffers = malloc(jobs_distributed * sizeof(struct job));
+
+    for(int i = 0; i < size-1; i++)
+        send_buffers[i].multiplier = multiplier;
 
     time_begin = MPI_Wtime();
     /* vérifie que x n'est pas divisible par 2, sinon s'arrête ! */
@@ -215,7 +219,9 @@ void eratostene_coordinator(const int size, mpz_t x, const unsigned int multipli
                 mpz_clears(q, racine2x, racine4x, div, reste, NULL);
                 return;
             case my_life_for_the_master:
-                current = send_job(status.MPI_SOURCE, current, multiplier);
+                send_buffers[status.MPI_SOURCE - 1].start = current;
+                send_job(status.MPI_SOURCE, &send_buffers[status.MPI_SOURCE - 1]);
+                current += multiplier * TAILLE_CRIBLE;
                 jobs_distributed++;
                 if(pretty_print){
                     for(int i = 0; i < size - status.MPI_SOURCE; i++)
@@ -255,6 +261,7 @@ void eratostene_coordinator(const int size, mpz_t x, const unsigned int multipli
 
     shutdown_all_slaves(size);
     mpz_clears(q, racine2x, racine4x, div, reste, NULL);
+    free(send_buffers);
 }
 
 void eratostene_slaves(mpz_t x){
@@ -313,14 +320,11 @@ void eratostene_slaves(mpz_t x){
 void shutdown_all_slaves(const int size){
     if(size < 1)
         return;
-    MPI_Status status;
     MPI_Request *req = malloc(((size_t)size-1)*sizeof(MPI_Request));
     for(int i = 1; i < size; i++){
         MPI_Isend(NULL, 0, MPI_CHAR, i, slave_shutdown, MPI_COMM_WORLD, &req[i-1]);
     }
-    for(int i = 1; i < size; i++){
-        MPI_Wait(&req[i-1], &status);
-    }
+    MPI_Waitall(size-1, req, MPI_STATUSES_IGNORE);
     free(req);
 }
 
@@ -382,13 +386,11 @@ unsigned long long yes_my_lord_work_in_progress(const struct job todo, mpz_t num
     return 0;
 }
 
-unsigned long long send_job(const int process_id,
-        const unsigned long long current,
-        const unsigned int times){
-    struct job todo = { current, times };
-    MPI_Send(&todo, 1, message_datatype, process_id, here_take_my_gift_son,
-            MPI_COMM_WORLD);
-    return current + times * TAILLE_CRIBLE;
+void send_job(const int process_id, struct job *todo){
+    MPI_Request request;
+    MPI_Isend(todo, 1, message_datatype, process_id, here_take_my_gift_son,
+            MPI_COMM_WORLD, &request);
+    MPI_Request_free(&request);
 }
 
 unsigned long long wait_for_any_other_response(unsigned int *jobs){

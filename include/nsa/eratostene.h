@@ -104,9 +104,7 @@ unsigned long long yes_my_lord_work_in_progress(struct job todo, mpz_t number,
         const unsigned char * const e_base, unsigned char *temp,
         struct job *next, MPI_Request **response);
 
-unsigned long long send_job(const int process_id,
-        const unsigned long long current,
-        const unsigned int times);
+void send_job(const int process_id, struct job *todo);
 
 unsigned long long wait_for_any_other_response(unsigned int *responses);
 
