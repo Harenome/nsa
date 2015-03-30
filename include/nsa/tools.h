@@ -3,10 +3,16 @@
 
 #include <gmp.h>
 
-//vrai si l'entrée j du tableau correspond à un nombre premier (2j+1 est premier)
+/**
+ * \brief Test si le nombre j est premier dans le tableau
+ * vrai si l'entrée j du tableau correspond à un nombre premier
+ * (2j+1 est premier)
+ */
 #define PREMIER(tab,j) (((tab[(j)>>3])&(1<<((j)&7)))==0)
 
-//met 1 dans le tableau en position j (bitwise)
+/**
+ * \brief Met 1 dans le tableau en position j (bitwise)
+ */
 #define MET1(tab,j) (tab[(j)>>3] |= (1<<((j)&7)))
 
 /** fonctions de conversion ULL <-> mpz_t

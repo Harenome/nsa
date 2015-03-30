@@ -88,7 +88,7 @@ unsigned char *eratostene_base(unsigned long long n)
     return( tab );
 }
 
-unsigned char *eratostene_intervalle( unsigned char *tab,
+void eratostene_intervalle( unsigned char *tab,
         const unsigned long long min, const unsigned char *const e_base ){
     unsigned long long i;
     const unsigned long long max = min+TAILLE_CRIBLE;
@@ -121,7 +121,6 @@ unsigned char *eratostene_intervalle( unsigned char *tab,
             // la borne inf devrait être comme ci-dessus,
             // mais comme le premier morceau fait au moins TAILLE_CRIBLE (garanti par l'appelant)
             // ça ne devrait jamais arriver (inf==i).
-
             for( j= inf-min/2 ; j<(TAILLE_CRIBLE>>1) ; j+=prem )
             {
                 MET1(tab,j);
@@ -265,7 +264,7 @@ void eratostene_coordinator(const int size, mpz_t x, const unsigned int multipli
 }
 
 void eratostene_slaves(mpz_t x){
-    struct job todo;
+    struct job todo, todobis;
     unsigned long long response = 0;
     enum message_type what_should_i_do;
 
@@ -296,6 +295,7 @@ void eratostene_slaves(mpz_t x){
             what_should_i_do = slave_wait_for_jobs(&todo);
         else{
             what_should_i_do = slave_wait_for_pending_jobs(next_response);
+            todo = todobis;
             free(next_response);
             next_response = NULL;
         }
@@ -307,7 +307,7 @@ void eratostene_slaves(mpz_t x){
                 return;
             case here_take_my_gift_son:
                 response = yes_my_lord_work_in_progress(todo, x, tab_erato,
-                        temp, &todo, &next_response);
+                        temp, &todobis, &next_response);
                 if(response)
                     i_got_it(response);
                 break;
