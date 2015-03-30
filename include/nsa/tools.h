@@ -5,7 +5,8 @@
 
 /**
  * \brief Test si le nombre j est premier dans le tableau
- * vrai si l'entrée j du tableau correspond à un nombre premier
+ *
+ * Vrai si l'entrée j du tableau correspond à un nombre premier
  * (2j+1 est premier)
  */
 #define PREMIER(tab,j) (((tab[(j)>>3])&(1<<((j)&7)))==0)
@@ -15,8 +16,10 @@
  */
 #define MET1(tab,j) (tab[(j)>>3] |= (1<<((j)&7)))
 
-/** fonctions de conversion ULL <-> mpz_t
- * elles n'existent pas par défaut dans gmp :(
+/**
+ * \brief Fonctions de conversion ULL <-> mpz_t
+ *
+ * Elles n'existent pas par défaut dans gmp :(
  * source: stackoverflow.
  */
 static inline void mpz_set_ull(mpz_t n, unsigned long long ull)
@@ -26,6 +29,12 @@ static inline void mpz_set_ull(mpz_t n, unsigned long long ull)
     mpz_add_ui(n, n, (unsigned int)ull);      /* n += (unsigned int)ull */
 }
 
+/**
+ * \brief Fonctions de conversion mpz_t <-> ULL
+ *
+ * Elles n'existent pas par défaut dans gmp :(
+ * source: stackoverflow.
+ */
 static inline unsigned long long mpz_get_ull(mpz_t n)
 {
     unsigned int lo, hi;

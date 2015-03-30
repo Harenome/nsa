@@ -56,20 +56,23 @@
  * \brief Les messages échangés entre les processus.
  */
 enum message_type{
-    slave_shutdown,         /**> Indique aux esclaves de terminer */
-    we_found_something,     /**> Indique au coordinateur qu'une solution est trouvée. */
-    my_life_for_the_master, /**> Indique au coordinateur qu'un esclave demande du travail */
-    here_take_my_gift_son,  /**> Indique a un esclave un travail à effectuer */
-    hey_listen,             /**> Indique au père qu'un intervalle est calculé */
-    //whats_up,               /** Demande du coordinateur aux esclaves ou ils en sont */
+    slave_shutdown,         /**< Indique aux esclaves de terminer */
+    we_found_something,     /**< Indique au coordinateur qu'une solution est trouvée. */
+    my_life_for_the_master, /**< Indique au coordinateur qu'un esclave demande du travail */
+    here_take_my_gift_son,  /**< Indique a un esclave un travail à effectuer */
+    hey_listen,             /**< Indique au père qu'un intervalle est calculé */
+    //whats_up,               /**< Demande du coordinateur aux esclaves ou ils en sont */
 };
 
 /**
  * \brief Structure pour donner du travail aux processus qui en demandent.
+ *
+ * Chaque processus reçoit un point de départ et vas effectuer son travail sur
+ * [start, start+multiplier*TAILLE_CRIBLE]
  */
 struct job{
-    unsigned long long start;   /**> Donne le point de départ du calcul */
-    unsigned int multiplier;    /**> Donne TAILLE_CRIBLE * multiplier à calculer */
+    unsigned long long start;   /**< Donne le point de départ du calcul */
+    unsigned int multiplier;    /**< Donne TAILLE_CRIBLE * multiplier à calculer */
 };
 
 /**
@@ -81,7 +84,8 @@ void init_eratostene(void);
  * \brief Crible d'ératostène initial, entre 1 et n
  * \param n Le nombre maximum pour lequel on cherchera les nombres premiers.
  * \return Un tableau contenant les nombres premiers jusqu'à n
- * le tableau renvoyé contient, pour chaque entier impair (1,3,5,7,...),
+ *
+ * Le tableau renvoyé contient, pour chaque entier impair (1,3,5,7,...),
  * des bits à 0 pour les nombres premiers, 1 pour les autres.
  * les deux macros PREMIER(tab,j) et MET1(tab,j) accèdent aux bits
  * du tableau : PREMIER teste si le nombre en position j est premier,
@@ -95,11 +99,12 @@ unsigned char *eratostene_base( unsigned long long n );
  * \param tab Est un tableau de taille TAILLE_CRIBLE/(8*2). 8 impairs par char.
  * \pre max est inférieur au carré du plus grand nombre stocké dans e_base
  * \pre min est impair
+ *
  * Le tableau tab de taille suffisante est alloué par l'appelant
  * tous les multiples des nombres premiers stockés dans e_base vont être
- * éliminés de l'intervalle min-max par cette fonction.
+ * éliminés de l'intervalle [min, min+TAILLE_CRIBLE] par cette fonction.
  * renvoie un champ de bits correspondant aux entiers min, min+2, min+4, ...
- * qui vaut 0 si le nombre est premier, 1 sinon
+ * qui vaut 0 si le nombre est premier, 1 sinon.
  */
 void eratostene_intervalle(unsigned char *tab,
         const unsigned long long min, const unsigned char * const e_base );
@@ -109,6 +114,8 @@ void eratostene_intervalle(unsigned char *tab,
  * si une solution est trouvée.
  * \param size Le nombre total de threads crées par MPI.
  * \param x Le nombre dont on cherche la factorisation.
+ * \param multiplier Le facteur tel qu'un job envoyé aux esclaves sera
+ * multiplier * TAILLE_CRIBLE
  * \param pretty_print Positionner à 0 pour un affichage minimaliste et autre
  * pour afficher le travail effectuer par chaque thread.
  */

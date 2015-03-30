@@ -127,8 +127,6 @@ void eratostene_intervalle( unsigned char *tab,
             }
         }
     }
-
-    return( tab );
 }
 
 void eratostene_coordinator(const int size, mpz_t x, const unsigned int multiplier,
