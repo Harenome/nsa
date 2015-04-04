@@ -42,6 +42,7 @@
 #include <math.h>
 #include <gmp.h>
 #include <mpi.h>
+#include <limits.h>
 
 /**
  * \brief The identity of the coordinator process

@@ -131,8 +131,8 @@ void eratostene_intervalle( unsigned char *tab,
 
 void eratostene_coordinator(const int size, mpz_t x, const unsigned int multiplier,
         const int pretty_print){
-    mpz_t q, racine2x, racine4x, div, reste;
-    mpz_inits(q, racine2x, racine4x, div, reste, NULL);
+    mpz_t q, racine2x, racine4x, div, reste, ullmax;
+    mpz_inits(q, racine2x, racine4x, div, reste, ullmax, NULL);
     double time_begin, time_found;
     unsigned int jobs_distributed = (unsigned int) size - 1;
     struct job *send_buffers = malloc(jobs_distributed * sizeof(struct job));
@@ -154,6 +154,17 @@ void eratostene_coordinator(const int size, mpz_t x, const unsigned int multipli
 
     mpz_sqrt( racine2x , x );
     mpz_sqrt( racine4x , racine2x );
+    mpz_set_ull(ullmax, ULLONG_MAX);
+    if(mpz_cmp(racine2x, ullmax) > 0){ // racine2x > maximum d'un unsigned long long
+        fprintf(stderr,
+                "The square root of the number you are give is greater than the"
+                " maximum handeled by this implementation, aborting.\n");
+        shutdown_all_slaves(size);
+        mpz_clears(q, racine2x, racine4x, div, reste, ullmax, NULL);
+        free(send_buffers);
+        return;
+    }
+    mpz_clear(ullmax);
 
     // racine(x) et racine(racine(x)) sont supposés tenir dans un unsigned long long
     // Le premier morceau doit faire au moins TAILLE_CRIBLE...
