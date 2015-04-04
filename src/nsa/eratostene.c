@@ -262,7 +262,7 @@ void eratostene_coordinator(const int size, mpz_t x, const unsigned int multipli
 }
 
 void eratostene_slaves(mpz_t x){
-    struct job todo, todobis;
+    struct job todo;
     unsigned long long response = 0;
     enum message_type what_should_i_do;
 
@@ -293,7 +293,6 @@ void eratostene_slaves(mpz_t x){
             what_should_i_do = slave_wait_for_jobs(&todo);
         else{
             what_should_i_do = slave_wait_for_pending_jobs(next_response);
-            todo = todobis;
             free(next_response);
             next_response = NULL;
         }
@@ -305,7 +304,7 @@ void eratostene_slaves(mpz_t x){
                 return;
             case here_take_my_gift_son:
                 response = yes_my_lord_work_in_progress(todo, x, tab_erato,
-                        temp, &todobis, &next_response);
+                        temp, &todo, &next_response);
                 if(response)
                     i_got_it(response);
                 break;
@@ -343,7 +342,7 @@ enum message_type slave_wait_for_pending_jobs(MPI_Request *request){
     return status.MPI_TAG;
 }
 
-unsigned long long yes_my_lord_work_in_progress(const struct job todo, mpz_t number,
+unsigned long long yes_my_lord_work_in_progress(struct job todo, mpz_t number,
         const unsigned char * const e_base, unsigned char * const temp,
         struct job *next, MPI_Request **response){
     MPI_Request request;

@@ -51,7 +51,8 @@ static inline void fprintf_help(FILE *outstream, const char* const executable_pa
             "Options:\n"
             "\t-h : print this help and exit\n"
             "\t-v : print version and exit\n"
-            "\t-m <value> : multiplicative factor for the scattering (value > 0)\n",
+            "\t-m <value> : multiplicative factor for the scattering (value > 0)\n"
+            "\t-p : print for each thread the chunk it has been affected\n",
             executable_path);
 }
 
