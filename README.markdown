@@ -35,6 +35,21 @@ $ mkdir build && cd build
 $ cmake ..
 $ make
 ```
+### Documentation
+
+#### Prérequis
+
+- [Doxygen][]
+
+#### Optionnel
+
+- [Graphviz][] Pour les graphes dans la documentation.
+
+#### Générer la documentation
+
+```bash
+$ make doc
+```
 
 Installer
 ---------
@@ -61,6 +76,7 @@ $ mpirun <options_mpirun> nsa <options_nsa> <nombre_à_factoriser>
   pour chaque job.
 - ``-p`` affiche le travail donné pour chaque threads.
 
+
 License
 -------
 Copyright © 2015 SCHMITT Maxime, RAZANAJATO RANAIVOARIVONY Harenome
@@ -75,3 +91,5 @@ au fichier COPYING, ou bien http://www.wtfpl.net/.
 [CMake]: http://www.cmake.org/
 [GMP]: https://gmplib.org/
 [MPI]: http://www.open-mpi.org/
+[Doxygen]: http://www.doxygen.org/
+[Graphviz]: http://graphviz.org/
