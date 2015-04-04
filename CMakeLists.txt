@@ -3,14 +3,14 @@ cmake_minimum_required(VERSION 2.8)
 ################################## PROJECT ##################################
 
 project(NSA)
-set(NSA_VERSION_MAJOR 0)
-set(NSA_VERSION_MINOR 1)
-set(NSA_VERSION_PATCH 1)
+set(NSA_VERSION_MAJOR 1)
+set(NSA_VERSION_MINOR 0)
+set(NSA_VERSION_PATCH 0)
 
 
-if(NOT CMAKE_BUILD_TYPE MATCHES Release)
-    set(CMAKE_BUILD_TYPE Debug)
-    message(STATUS "Debug mode active")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+    message(STATUS "Building Release")
 endif()
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
@@ -72,7 +72,7 @@ include_directories("${AUTOGEN_OUTPUT_PATH}/include")
 ################################## COMPILER ##################################
 
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -O3 -march=native")
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wswitch-default -Winit-self -Wshadow -Wbad-function-cast -Wcast-align -Wconversion -Wlogical-op -Wstrict-prototypes -Wnested-externs")
