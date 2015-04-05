@@ -1,6 +1,6 @@
 PDF = $(patsubst %.markdown,%.pdf,$(wildcard *.markdown))
 PANDOC = pandoc
-PANDOC_FLAGS = -s --number-sections
+PANDOC_FLAGS = -s
 
 all: $(PDF)
 
@@ -8,4 +8,4 @@ all: $(PDF)
 	$(PANDOC) $(PANDOC_FLAGS) $< -o $@
 
 clean:
-	rm -rf $(PDF) *.aux *.log *.out *.tex graphviz-images
+	rm -rf $(PDF)
