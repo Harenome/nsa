@@ -37,12 +37,16 @@ $ cmake ..
 $ make
 ```
 
-Sans `cmake` (attention : ce n'est pas un `configure` venant des autotools !) :
+Sans `cmake` :
 
 ```bash
 $ ./configure
 $ make
 ```
+
+Note : Le script `configure` n'a pas été généré avec les autotools, il se
+contente de générer des fichiers nécéssaires à la compilation et ne vérifie pas
+la présence ou la version des bibliothèques et outils...
 
 ### Documentation
 
