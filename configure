@@ -1,0 +1,60 @@
+#!/bin/bash
+
+function grep_cmake_var
+{
+    grep "$1" CMakeLists.txt | awk '{ print $2; }' | tr -d ')'
+}
+
+function sed_cmake_var
+{
+    sed -i "s/\@$1\@/$2/" $3
+}
+
+function replace_a_var
+{
+    local VALUE=$(grep_cmake_var $1)
+    sed_cmake_var $1 $VALUE $2
+}
+
+function replace_curly_var
+{
+    sed -i "s/\${$1}/$2/" $3
+}
+
+if ! [[ -f build/autogen/include/nsa/version.h ]]; then
+    echo -e "Generating \x1B[1mversion.h\x1B[0m..."
+
+    VERSION_H="build/autogen/include/nsa/version.h"
+
+    mkdir -p "build/autogen/include/nsa"
+    cp config/version.h.in $VERSION_H
+
+    replace_a_var NSA_VERSION_MAJOR $VERSION_H
+    replace_a_var NSA_VERSION_MINOR $VERSION_H
+    replace_a_var NSA_VERSION_PATCH $VERSION_H
+
+    replace_curly_var USERNAME $(whoami) $VERSION_H
+    replace_curly_var HOSTNAME $(hostname) $VERSION_H
+    replace_curly_var DATE "$(date)" $VERSION_H
+    replace_curly_var CMAKE_PROJECT_NAME NSA $VERSION_H
+fi
+
+if ! [[ -f build/autogen/Doxyfile ]]; then
+    echo -e "Generating \x1B[1mDoxyfile\x1B[0m..."
+
+    DOXYFILE="build/autogen/Doxyfile"
+
+    mkdir -p build/autogen
+    cp config/Doxyfile.in $DOXYFILE
+
+    replace_a_var NSA_VERSION_MAJOR $DOXYFILE
+    replace_a_var NSA_VERSION_MINOR $DOXYFILE
+    replace_a_var NSA_VERSION_PATCH $DOXYFILE
+
+    sed_cmake_var CMAKE_PROJECT_NAME NSA $DOXYFILE
+    sed_cmake_var DOXYGEN_OUTPUT_DIR "build\/doc" $DOXYFILE
+    sed_cmake_var DOXYGEN_WARNINGS NO $DOXYFILE
+    sed_cmake_var DOXYGEN_HAVE_DOT NO $DOXYFILE
+    sed_cmake_var DOXYGEN_DOT_EXECUTABLE dot $DOXYFILE
+    sed_cmake_var DOXYGEN_INPUT_DIRS "src\/ include\/" $DOXYFILE
+fi

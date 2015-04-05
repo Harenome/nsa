@@ -36,6 +36,14 @@ $ mkdir build && cd build
 $ cmake ..
 $ make
 ```
+
+Sans `cmake` (attention : ce n'est pas un `configure` venant des autotools !) :
+
+```bash
+$ ./configure
+$ make
+```
+
 ### Documentation
 
 #### Prérequis
@@ -63,7 +71,8 @@ Lancer nsa
 ----------
 
 Si vous avez sauté la phase d'installation, le binaire se trouve dans le dossier
-`<Dossier_de_build>/bin`.
+`<Dossier_de_build>/bin` (si compilé avec `cmake`) ou `bin` (si compilé avec
+le `Makefile` à la racine).
 
 ```bash
 $ mpirun <options_mpirun> nsa <options_nsa> <nombre_à_factoriser>
