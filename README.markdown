@@ -8,15 +8,16 @@ Projet de l'UE « Parallélisme », Master 1 RISE,
 Que fait ce programme ?
 -----------------------
 
-Ce programme prends un nombre semi-premier en entrée, c'est à dire qu'il
-est un produit entre deux nombres premiers, puis trouve les deux nombres
-premiers qui le factorise à moins qu'il soit lui même premier.
+Ce programme prend un nombre semi-premier en entrée, c'est à dire un nombre qui
+est le produit de deux nombres premiers, puis trouve ces deux nombres premiers
+(sauf si le nombre fourni est lui même premier).
 
-Si le nombre donné n'est pas semi-premier vous pouvez réitérer sur le
-résultat jusqu'à l'obtention de sa factorisation en nombre premier.
+Dans le cas où le nombre fourni n'est pas semi-premier, il est possible
+d'obtenir sa factorisation en nombre premiers en utilisant le programme sur les
+résultats obtenus.
 
-La limite due à l'implémentation est que la racine du nombre recherché soit
-inférieur au maximum contenu dans un entier 64bits non signé.
+Les détails d'implémentation imposent la limite suivante : la racine carré du
+nombre fourni doit être inférieure au maximum des entiers 64 bits non signés.
 
 Prérequis
 ---------
@@ -35,6 +36,14 @@ $ mkdir build && cd build
 $ cmake ..
 $ make
 ```
+
+Sans `cmake` (attention : ce n'est pas un `configure` venant des autotools !) :
+
+```bash
+$ ./configure
+$ make
+```
+
 ### Documentation
 
 #### Prérequis
@@ -62,7 +71,8 @@ Lancer nsa
 ----------
 
 Si vous avez sauté la phase d'installation, le binaire se trouve dans le dossier
-``<Dossier_de_build>/bin``.
+`<Dossier_de_build>/bin` (si compilé avec `cmake`) ou `bin` (si compilé avec
+le `Makefile` à la racine).
 
 ```bash
 $ mpirun <options_mpirun> nsa <options_nsa> <nombre_à_factoriser>
@@ -70,11 +80,11 @@ $ mpirun <options_mpirun> nsa <options_nsa> <nombre_à_factoriser>
 
 ### Options nsa
 
-- ``-h`` affiche l'aide et quitte.
-- ``-v`` affiche la version et quitte.
-- ``-m`` change le facteur multiplicatif du nombre d'intervalles à distribuer
+- `-h` affiche l'aide et quitte.
+- `-v` affiche la version et quitte.
+- `-m` change le facteur multiplicatif du nombre d'intervalles à distribuer
   pour chaque job.
-- ``-p`` affiche le travail donné pour chaque threads.
+- `-p` affiche le travail donné pour chaque threads.
 
 
 License
