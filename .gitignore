@@ -1,0 +1,56 @@
+# This is a global “ignorefile” or “excludesfile”.
+# This file may be found “as is” in some projects if I was too lazy and
+# merely copied it into the root directory of the project without further
+# edition. Thus, please ignore irrelevant patterns.
+
+# Misc.
+*.old
+*~
+
+# Vim files
+*.swp
+
+# C
+*.[ao]
+*.lib
+*.ko
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Lex / Yacc
+lex.yy.c
+y.tab.c
+y.tab.h
+y.output
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Python
+*.pyc
+
+# Tags
+tags
+.tags
+
+# Various dirs.
+doc/
+obj/
+bin/
+bytecode/
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Cmake
+build
+
+# Altered files
+include/nsa/version.h
