@@ -120,7 +120,7 @@ FLAGS_CC_MINIMAL = -std=gnu99 $(FLAGS_CC_INCLUDE)
 # from overriding other variables...) to override.
 
 ## Shell
-SHELL = /bin/sh
+SHELL = /bin/bash
 
 ## Programs
 # These variables usually are implicitly defined.
